@@ -9,41 +9,83 @@
   <p class="text-sm">{{ 'ERROR_HAS_OCCURED' | translate }}</p>
 </div>
 
-<!-- Main layout -->
-<div [class.hidden]="loading || error" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div [class.hidden]="loading || error">
 
-  <!-- Mobile sidebar overlay backdrop -->
-  <div *ngIf="displaySidebar"
-       class="fixed inset-0 z-40 bg-black/40 md:hidden"
-       (click)="toggleSidebar(false)">
+  <!-- Search bar -->
+  <div class="border-b border-border bg-background">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex gap-0 rounded-xl border border-border bg-background shadow-sm overflow-hidden">
+
+        <!-- What -->
+        <div class="flex-1 flex flex-col px-5 py-3 border-r border-border">
+          <label class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">What</label>
+          <input
+            type="text"
+            class="text-sm text-foreground bg-transparent outline-none placeholder:text-muted-foreground/60"
+            placeholder="Job title, keywords..."
+            [(ngModel)]="whatInput"
+            (keyup.enter)="search()" />
+        </div>
+
+        <!-- Where -->
+        <div class="flex-1 flex flex-col px-5 py-3 border-r border-border">
+          <label class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">Where</label>
+          <input
+            type="text"
+            class="text-sm text-foreground bg-transparent outline-none placeholder:text-muted-foreground/60"
+            placeholder="City, state..."
+            [(ngModel)]="whereInput"
+            (keyup.enter)="search()" />
+        </div>
+
+        <!-- Search button -->
+        <button type="button" (click)="search()"
+                class="px-8 bg-primary text-primary-foreground font-semibold text-sm
+                       hover:bg-primary/90 active:bg-primary/80 transition-colors shrink-0">
+          Search
+        </button>
+
+      </div>
+    </div>
   </div>
 
-  <div class="flex gap-10 py-8">
+  <!-- Two-column layout -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <!-- Sidebar -->
-    <aside [class.hidden]="!displaySidebar"
-           class="fixed inset-y-0 left-0 z-50 w-72 bg-background overflow-y-auto px-6
-                  md:relative md:flex md:flex-col md:inset-auto md:z-auto md:overflow-visible
-                  md:w-56 lg:w-64 md:px-0 shrink-0 md:sticky md:top-14 md:self-start">
-      <app-sidebar
-        (newFilter)="onSidebarFilter($event)"
-        [display]="displaySidebar"
-        (toggleSidebar)="toggleSidebar($event)"
-        class="w-full">
-      </app-sidebar>
-    </aside>
+    <!-- Mobile sidebar backdrop -->
+    <div *ngIf="displaySidebar"
+         class="fixed inset-0 z-40 bg-black/40 md:hidden"
+         (click)="toggleSidebar(false)">
+    </div>
 
-    <!-- Job list -->
-    <main class="flex-1 min-w-0">
-      <app-job-list
-        [filterCount]="filterCount"
-        [filter]="listFilter"
-        [sidebarVisible]="displaySidebar"
-        (displaySidebar)="toggleSidebar($event)"
-        (showLoading)="handleListLoad($event)"
-        (showError)="handleError($event)">
-      </app-job-list>
-    </main>
+    <div class="flex gap-10">
 
+      <!-- Sidebar -->
+      <aside [class.hidden]="!displaySidebar"
+             class="fixed inset-y-0 left-0 z-50 w-72 bg-background overflow-y-auto px-6
+                    md:relative md:flex md:flex-col md:inset-auto md:z-auto md:overflow-visible
+                    md:w-52 lg:w-60 md:px-0 shrink-0 md:sticky md:top-14 md:self-start md:block">
+        <app-sidebar
+          (newFilter)="onSidebarFilter($event)"
+          [display]="displaySidebar"
+          (toggleSidebar)="toggleSidebar($event)"
+          class="w-full">
+        </app-sidebar>
+      </aside>
+
+      <!-- Job list -->
+      <main class="flex-1 min-w-0">
+        <app-job-list
+          [filterCount]="filterCount"
+          [filter]="listFilter"
+          [sidebarVisible]="displaySidebar"
+          (displaySidebar)="toggleSidebar($event)"
+          (showLoading)="handleListLoad($event)"
+          (showError)="handleError($event)">
+        </app-job-list>
+      </main>
+
+    </div>
   </div>
+
 </div>

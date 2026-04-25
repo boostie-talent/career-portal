@@ -1,28 +1,15 @@
-<div class="flex flex-col gap-6 py-6">
+<div class="flex flex-col gap-0 py-6">
 
   <!-- Mobile close -->
-  <div class="flex justify-end md:hidden px-4">
+  <div class="flex justify-end md:hidden mb-4">
     <button type="button" class="btn-icon" (click)="hideSidebar()">
       <lucide-angular [img]="icons.X" [size]="18"></lucide-angular>
     </button>
   </div>
 
-  <!-- Keyword search -->
-  <div class="relative">
-    <lucide-angular [img]="icons.Search" [size]="15"
-      class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
-    </lucide-angular>
-    <input
-      type="text"
-      class="input pl-9 text-sm"
-      [placeholder]="'KEYWORD_SEARCH' | translate"
-      [(ngModel)]="keyword"
-      (ngModelChange)="searchOnDelay()" />
-  </div>
-
-  <!-- Filter groups — no scroll containers, dividers between sections -->
+  <!-- Filter groups -->
   <div class="flex flex-col divide-y divide-border">
-    <div class="pb-4">
+    <div class="pb-5">
       <app-sidebar-filter
         field="publishedCategory(id,name)"
         [title]="'CATEGORY' | translate"
@@ -31,7 +18,7 @@
         data-automation-id="category">
       </app-sidebar-filter>
     </div>
-    <div class="py-4">
+    <div class="py-5">
       <app-sidebar-filter
         field="address(state)"
         [title]="'STATE' | translate"
@@ -40,7 +27,7 @@
         data-automation-id="state">
       </app-sidebar-filter>
     </div>
-    <div class="py-4">
+    <div class="py-5">
       <app-sidebar-filter
         field="address(city)"
         [title]="'CITY' | translate"
@@ -52,7 +39,7 @@
   </div>
 
   <!-- Language selector -->
-  <div *ngIf="languageDropdownEnabled">
+  <div *ngIf="languageDropdownEnabled" class="pt-5">
     <select class="input text-sm" (change)="setPreferredLanguage($any($event.target).value)">
       <option value="">{{ 'PREFERRED_LANGUAGE' | translate }}</option>
       <option *ngFor="let lang of availableLocales" [value]="lang.localeCode">{{ lang.name }}</option>
@@ -62,7 +49,7 @@
   <!-- Privacy policy link -->
   <a *ngIf="showPrivacyPolicy"
      (click)="viewPrivacyPolicy()"
-     class="text-xs text-muted-foreground underline-offset-2 underline cursor-pointer hover:text-foreground transition-colors">
+     class="text-xs text-muted-foreground underline-offset-2 underline cursor-pointer hover:text-foreground transition-colors pt-5">
     {{ 'PRIVACY_POLICY' | translate }}
   </a>
 

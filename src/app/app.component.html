@@ -1,8 +1,16 @@
 <nav class="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-  <div class="container mx-auto flex h-14 items-center gap-4 px-4">
-    <a [href]="companyUrl || '/'" class="flex items-center gap-2 shrink-0">
-      <img *ngIf="companyLogoPath" [src]="companyLogoPath" [alt]="companyName" class="h-8 w-auto" />
-      <span class="font-semibold text-foreground">{{ companyName }}</span>
+  <div class="max-w-5xl mx-auto flex h-14 items-center gap-5 px-4 sm:px-6 lg:px-8">
+    <a [href]="companyUrl || '/'" class="flex items-center gap-2.5 shrink-0">
+      <img *ngIf="companyLogoPath" [src]="companyLogoPath" [alt]="companyName" class="h-7 w-auto" />
+      <span class="font-bold text-foreground">{{ companyName }}</span>
+    </a>
+    <a *ngIf="companyUrl" [href]="companyUrl" target="_blank" rel="noopener noreferrer"
+       class="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline-flex items-center gap-1">
+      {{ companyUrl | slice:companyUrl.indexOf('//')+2 }}
+      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 7h10v10"/><path d="M7 17 17 7"/>
+      </svg>
     </a>
   </div>
 </nav>
