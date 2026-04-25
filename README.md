@@ -1,66 +1,106 @@
-# Bullhorn Career Portal
+# Boostie Career Portal
 
-[![Build Status](https://travis-ci.org/bullhorn/career-portal.svg)](https://travis-ci.org/bullhorn/career-portal)
+A modern, white-label career portal for staffing and recruiting firms using Bullhorn ATS, with first-class Boostie integration. Forked from [bullhorn/career-portal](https://github.com/bullhorn/career-portal) and rebuilt from the ground up.
 
-**[Bullhorn Career Portal](http://www.bullhorn.com)** is the next-generation way to share jobs and source candidates from your Bullhorn ATS/CRM instance. Download, configure and host your own career portal, or fork the source code and make it your own.\
-## Releases
+---
 
-* **[Latest Release](https://github.com/bullhorn/career-portal/releases/latest)**
-* **[All Releases](https://github.com/bullhorn/career-portal/releases)**
+## What's different from the original
 
-## Contribute
+| | Original | This fork |
+|---|---|---|
+| Framework | Angular 10 | Angular 18 (standalone components) |
+| UI library | `novo-elements` (proprietary Bullhorn) | Tailwind CSS |
+| Icons | `bullhorn-icons` / `bhi-*` | `lucide-angular` |
+| Forms | `novo-form` | Angular Reactive Forms |
+| SSR | `@nguniversal` | `@angular/ssr` (built-in) |
+| Node | 16 | 20 LTS |
+| Linting | tslint | ESLint + angular-eslint |
 
-There are many ways to **[contribute](https://github.com/bullhorn/career-portal/blob/master/CONTRIBUTING.md)** to Bullhorn Career Portal.
-* **[Submit bugs](https://github.com/bullhorn/career-portal/issues)** and help us verify fixes as they are checked in.
-* Review **[source code changes](https://github.com/bullhorn/career-portal/pulls)**.
-* **[Contribute bug fixes](https://github.com/bullhorn/career-portal/blob/master/CONTRIBUTING.md)**.
+---
 
-## Documentation
+## Boostie integration
 
-*  **[Hosting](https://github.com/bullhorn/career-portal/wiki)**
-*  **[Bullhorn Public REST API Reference](https://bullhorn.github.io/Public-API/)**
-*  **[Bullhorn REST API Reference](http://bullhorn.github.io/rest-api-docs/)**
-*  **[Bullhorn Platform](http://bullhorn.github.io/platform)**
-*  **[Bullhorn Website](http://www.bullhorn.com)**
+When `boostie.clientId` is set in `app.json`, the portal:
 
-## Building
+1. Injects the Boostie script into `<head>` at app boot (browser-only, SSR-safe)
+2. Renders a `<button id="job-apply">` on the job detail page for Boostie to wire up
+3. Renders a hidden `<div id="jobId">` so Boostie's script can identify the Bullhorn job
+4. Suppresses the native Bullhorn apply modal — Boostie owns the entire apply experience
 
-In order to build Bullhorn Career Portal, ensure that you have **[Git](http://git-scm.com/downloads)**, **[Node.js](http://nodejs.org)**, and **[Angular CLI](https://angular.io/guide/setup-local#step-1-install-the-angular-cli)** installed.
-
-Clone a copy of the repo:
-
-```
-git clone https://github.com/bullhorn/career-portal.git
-```
-
-Change to the Career Portal directory:
-
-```
-cd career-portal
+```json
+{
+  "boostie": {
+    "clientId": "your-client-id-here"
+  }
+}
 ```
 
-Install build tools and dev dependencies:
+Set `clientId` to `null` to disable Boostie and use the native Bullhorn apply flow.
 
-```
+---
+
+## Configuration (`src/app.json`)
+
+| Field | Description |
+|---|---|
+| `companyName` | Displayed in the nav bar |
+| `companyLogoPath` | Path to logo (e.g. `./assets/logo.svg`) |
+| `companyUrl` | Company website — shown as a nav link |
+| `service.corpToken` | Bullhorn corp token |
+| `service.swimlane` | Bullhorn swimlane number |
+| `boostie.clientId` | Boostie client ID (`null` to disable) |
+
+---
+
+## Getting started
+
+Requires Node 20+.
+
+```bash
 npm install
+npm run serve        # Dev server (static, no SSR) at http://localhost:4200
 ```
 
-Use one of the following to build and test:
+---
 
+## Build modes
+
+| Mode | Command | Output |
+|---|---|---|
+| `static` | `ng build --configuration=static` | Browser-only, for S3 / Netlify / CDN |
+| `dynamic` | `ng build --configuration=dynamic` | Express + SSR |
+| `qa` | `ng build --configuration=qa` | QA environment |
+
+Static builds go to `dist/career-portal/browser/`.
+
+---
+
+## Deploying with SSR
+
+Build with `--configuration=dynamic`, then run:
+
+```bash
+node dist/career-portal/server/server.mjs
 ```
-npm run serve           # Launch a local version of the career portal (frontend only).
-npm start               # Launch a local server with server side rendering portal.
-npm run build:static    # Build an optimized version of Career Portal in `/dist`
-npm run build          # Build a package for use with server side rendering
-```
 
+Environment variables override `app.json` values at runtime:
 
+| Variable | Maps to |
+|---|---|
+| `COMPANY_NAME` | `companyName` |
+| `COMPANY_WEBSITE` | `companyUrl` |
+| `COMPANY_LOGO_URL` | `companyLogoPath` |
+| `BULLHORN_SWIMLANE` | `service.swimlane` |
+| `BULLHORN_CORP_TOKEN` | `service.corpToken` |
+| `HOSTED_ENDPOINT` | `careersUrl` |
+| `GOOGLE_ANALYTICS_TRACKING_ID` | `integrations.googleAnalytics.trackingId` |
+| `GOOGLE_VERIFICATION_CODE` | `integrations.googleSiteVerification.verificationCode` |
+| `ALLOWED_HOST` | Additional allowed hostname for SSRF mitigation |
+| `PORT` | Server port (default `4000`) |
 
-## Runtime vs. Buildtime Configurations
+---
 
-To maximize the flexibility of application configuration, all configuration-level integrations should derive their
-dynamic variables from the app.json file. That file can then be loaded into the application.
+## Credits
 
-## Helpful Utilities
-
-* **[NPM-Check-Updates](https://github.com/tjunnone/npm-check-updates)** - checks for updates of node modules with CLI
+Original open-source portal by [Bullhorn](https://github.com/bullhorn/career-portal).  
+Rebuilt and maintained by [Boostie](https://boostie.com).
