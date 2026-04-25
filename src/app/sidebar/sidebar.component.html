@@ -1,7 +1,7 @@
-<div class="flex flex-col h-full p-4 gap-5 bg-background border-r border-border">
+<div class="flex flex-col gap-6 py-6">
 
   <!-- Mobile close -->
-  <div class="flex justify-end md:hidden">
+  <div class="flex justify-end md:hidden px-4">
     <button type="button" class="btn-icon" (click)="hideSidebar()">
       <lucide-angular [img]="icons.X" [size]="18"></lucide-angular>
     </button>
@@ -9,44 +9,50 @@
 
   <!-- Keyword search -->
   <div class="relative">
-    <lucide-angular [img]="icons.Search" [size]="16"
+    <lucide-angular [img]="icons.Search" [size]="15"
       class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
     </lucide-angular>
     <input
       type="text"
-      class="input pl-9"
+      class="input pl-9 text-sm"
       [placeholder]="'KEYWORD_SEARCH' | translate"
       [(ngModel)]="keyword"
       (ngModelChange)="searchOnDelay()" />
   </div>
 
-  <!-- Filters -->
-  <div class="flex flex-col gap-4 flex-1 overflow-y-auto">
-    <app-sidebar-filter
-      field="publishedCategory(id,name)"
-      [title]="'CATEGORY' | translate"
-      [filter]="filter"
-      (checkboxFilter)="updateFilter('publishedCategory', $event)"
-      data-automation-id="category">
-    </app-sidebar-filter>
-    <app-sidebar-filter
-      field="address(state)"
-      [title]="'STATE' | translate"
-      [filter]="filter"
-      (checkboxFilter)="updateFilter('address(state)', $event)"
-      data-automation-id="state">
-    </app-sidebar-filter>
-    <app-sidebar-filter
-      field="address(city)"
-      [title]="'CITY' | translate"
-      [filter]="filter"
-      (checkboxFilter)="updateFilter('address(city)', $event)"
-      data-automation-id="city">
-    </app-sidebar-filter>
+  <!-- Filter groups — no scroll containers, dividers between sections -->
+  <div class="flex flex-col divide-y divide-border">
+    <div class="pb-4">
+      <app-sidebar-filter
+        field="publishedCategory(id,name)"
+        [title]="'CATEGORY' | translate"
+        [filter]="filter"
+        (checkboxFilter)="updateFilter('publishedCategory', $event)"
+        data-automation-id="category">
+      </app-sidebar-filter>
+    </div>
+    <div class="py-4">
+      <app-sidebar-filter
+        field="address(state)"
+        [title]="'STATE' | translate"
+        [filter]="filter"
+        (checkboxFilter)="updateFilter('address(state)', $event)"
+        data-automation-id="state">
+      </app-sidebar-filter>
+    </div>
+    <div class="py-4">
+      <app-sidebar-filter
+        field="address(city)"
+        [title]="'CITY' | translate"
+        [filter]="filter"
+        (checkboxFilter)="updateFilter('address(city)', $event)"
+        data-automation-id="city">
+      </app-sidebar-filter>
+    </div>
   </div>
 
   <!-- Language selector -->
-  <div *ngIf="languageDropdownEnabled" class="relative">
+  <div *ngIf="languageDropdownEnabled">
     <select class="input text-sm" (change)="setPreferredLanguage($any($event.target).value)">
       <option value="">{{ 'PREFERRED_LANGUAGE' | translate }}</option>
       <option *ngFor="let lang of availableLocales" [value]="lang.localeCode">{{ lang.name }}</option>
@@ -56,15 +62,8 @@
   <!-- Privacy policy link -->
   <a *ngIf="showPrivacyPolicy"
      (click)="viewPrivacyPolicy()"
-     class="text-xs text-muted-foreground underline cursor-pointer hover:text-foreground">
+     class="text-xs text-muted-foreground underline-offset-2 underline cursor-pointer hover:text-foreground transition-colors">
     {{ 'PRIVACY_POLICY' | translate }}
   </a>
 
-  <!-- Credits -->
-  <div class="flex items-center gap-2 text-xs text-muted-foreground pt-2 border-t border-border">
-    <span>Powered by</span>
-    <a target="_blank" href="https://www.bullhorn.com/" class="hover:opacity-80">
-      <img src="assets/logo.svg" alt="Bullhorn" class="h-5 w-auto" />
-    </a>
-  </div>
 </div>

@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter } from
 import { NgFor, NgIf } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { LucideAngularModule, SlidersHorizontal, SearchX } from 'lucide-angular';
+import { LucideAngularModule, SlidersHorizontal, SearchX, ArrowRight } from 'lucide-angular';
 import { SearchService } from '../services/search/search.service';
 import { SettingsService } from '../services/settings/settings.service';
 import { Title, Meta } from '@angular/platform-browser';
@@ -26,7 +26,7 @@ export class JobListComponent implements OnChanges {
   @Output() public showLoading = new EventEmitter<boolean>();
   @Output() public showError = new EventEmitter<boolean>();
 
-  public icons = { SlidersHorizontal, SearchX };
+  public icons = { SlidersHorizontal, SearchX, ArrowRight };
   public jobs: any[] = [];
   public _loading: boolean = true;
   public moreAvailable: boolean = true;

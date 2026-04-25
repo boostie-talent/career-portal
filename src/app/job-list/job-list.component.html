@@ -1,61 +1,66 @@
 <!-- Loading skeleton -->
-<div *ngIf="loading" class="flex flex-col gap-3">
+<div *ngIf="loading" class="flex flex-col gap-2">
   <div *ngFor="let i of [1,2,3,4,5]"
-       class="rounded-lg border border-border bg-card p-4 animate-pulse">
-    <div class="h-5 w-2/3 rounded bg-muted mb-2"></div>
-    <div class="h-3 w-1/3 rounded bg-muted mb-3"></div>
-    <div class="h-3 w-full rounded bg-muted"></div>
+       class="rounded-xl border border-border bg-card p-5 animate-pulse">
+    <div class="h-4 w-2/5 rounded-full bg-muted mb-3"></div>
+    <div class="h-3 w-1/4 rounded-full bg-muted mb-4"></div>
+    <div class="flex gap-2">
+      <div class="h-5 w-16 rounded-full bg-muted"></div>
+      <div class="h-5 w-20 rounded-full bg-muted"></div>
+    </div>
   </div>
 </div>
 
 <ng-container *ngIf="!loading">
-  <!-- Header bar -->
-  <div class="flex items-center justify-between mb-4">
-    <p class="text-sm text-muted-foreground">
-      {{ 'OPEN_POSITIONS' | translate }} ({{ total }})
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <p class="text-sm font-medium text-muted-foreground">
+      <span class="text-foreground font-semibold">{{ total }}</span> open positions
     </p>
-    <button type="button" class="btn-outline md:hidden text-sm" (click)="openSidebar()">
-      <lucide-angular [img]="icons.SlidersHorizontal" [size]="16" class="mr-2"></lucide-angular>
-      {{ 'FILTER' | translate }}
+    <button type="button" class="btn-outline md:hidden text-sm gap-1.5" (click)="openSidebar()">
+      <lucide-angular [img]="icons.SlidersHorizontal" [size]="14"></lucide-angular>
+      Filter
     </button>
   </div>
 
   <!-- Job cards -->
-  <div *ngIf="jobs.length > 0" class="flex flex-col gap-3">
-    <div *ngFor="let job of jobs"
-         class="rounded-lg border border-border bg-card p-4 hover:shadow-md transition-shadow cursor-pointer"
-         [routerLink]="'jobs/' + job.id"
-         (click)="loadJob(job.id)">
+  <div *ngIf="jobs.length > 0" class="flex flex-col gap-2">
+    <a *ngFor="let job of jobs"
+       [routerLink]="'jobs/' + job.id"
+       (click)="loadJob(job.id)"
+       class="group block rounded-xl border border-border bg-card px-5 py-4
+              hover:border-foreground/20 hover:shadow-sm transition-all duration-150">
+
       <div class="flex items-start justify-between gap-4">
         <div class="flex-1 min-w-0">
-          <a [href]="'jobs/' + job.id" [routerLink]="'jobs/' + job.id"
-             class="font-semibold text-base hover:text-primary hover:underline line-clamp-1">
+          <h3 class="font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors leading-snug">
             {{ job.title }}
-          </a>
-          <span *ngIf="job.publishedCategory && showCategory"
-                class="text-xs text-muted-foreground block mt-0.5">
+          </h3>
+          <p *ngIf="job.publishedCategory && showCategory"
+             class="text-xs text-muted-foreground mt-0.5">
             {{ job.publishedCategory?.name }}
-          </span>
-          <p class="text-sm text-muted-foreground mt-1 line-clamp-2">
-            {{ job.publicDescription | stripHtml }}
           </p>
         </div>
-        <div class="shrink-0">
-          <app-info-chips [job]="job"></app-info-chips>
-        </div>
+        <lucide-angular [img]="icons.ArrowRight" [size]="16"
+          class="shrink-0 mt-0.5 text-muted-foreground/0 group-hover:text-muted-foreground transition-all translate-x-0 group-hover:translate-x-0.5 duration-150">
+        </lucide-angular>
       </div>
-    </div>
+
+      <div class="mt-3">
+        <app-info-chips [job]="job"></app-info-chips>
+      </div>
+    </a>
   </div>
 
   <!-- Load more -->
-  <div *ngIf="moreAvailable" class="flex justify-center mt-6">
-    <button class="btn-outline" (click)="loadMore()">Load More</button>
+  <div *ngIf="moreAvailable" class="flex justify-center mt-8">
+    <button class="btn-outline text-sm" (click)="loadMore()">Load more positions</button>
   </div>
 
   <!-- Empty state -->
   <div *ngIf="jobs.length === 0"
        class="flex flex-col items-center justify-center min-h-[40vh] gap-3 text-muted-foreground">
-    <lucide-angular [img]="icons.SearchX" [size]="48"></lucide-angular>
-    <p>{{ 'NO_MATCHING_JOBS' | translate }}</p>
+    <lucide-angular [img]="icons.SearchX" [size]="40"></lucide-angular>
+    <p class="text-sm">No matching positions found</p>
   </div>
 </ng-container>

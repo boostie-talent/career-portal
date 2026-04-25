@@ -1,30 +1,48 @@
 <div class="flex flex-col gap-2">
+  <!-- Section header -->
   <button
     type="button"
-    class="flex items-center justify-between w-full text-sm font-semibold text-foreground py-1 hover:text-primary transition-colors"
+    class="flex items-center justify-between w-full text-xs font-semibold uppercase tracking-widest text-muted-foreground py-2 hover:text-foreground transition-colors"
     (click)="toggle()">
     <span>{{ title }}</span>
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
          [class.rotate-180]="expanded" class="transition-transform shrink-0">
       <path d="m6 9 6 6 6-6"/>
     </svg>
   </button>
 
-  <div *ngIf="loading && expanded" class="flex justify-center py-2">
-    <div class="h-4 w-4 animate-spin rounded-full border-2 border-border border-t-primary"></div>
-  </div>
+  <div *ngIf="expanded" class="flex flex-col gap-0.5">
+    <div *ngIf="loading" class="flex items-center gap-2 py-2">
+      <div class="h-3 w-3 animate-spin rounded-full border-2 border-border border-t-foreground"></div>
+      <span class="text-xs text-muted-foreground">Loading...</span>
+    </div>
 
-  <div *ngIf="!loading && expanded" class="flex flex-col gap-1.5 max-h-52 overflow-y-auto pr-1">
-    <label *ngFor="let option of options"
-           class="flex items-center gap-2 text-sm text-foreground cursor-pointer hover:text-primary">
-      <input
-        type="checkbox"
-        [(ngModel)]="option.checked"
-        (ngModelChange)="onCheckChange()"
-        class="h-4 w-4 rounded border-border text-primary focus:ring-primary" />
-      <span>{{ option.label }}</span>
-    </label>
-    <p *ngIf="options.length === 0" class="text-xs text-muted-foreground py-1">No options available</p>
+    <ng-container *ngIf="!loading">
+      <label *ngFor="let option of visibleOptions"
+             class="flex items-center gap-2.5 py-1 text-sm text-foreground cursor-pointer group">
+        <input
+          type="checkbox"
+          [(ngModel)]="option.checked"
+          (ngModelChange)="onCheckChange()"
+          class="h-3.5 w-3.5 rounded-sm border-muted-foreground/40 text-primary focus:ring-0 focus:ring-offset-0 shrink-0" />
+        <span class="group-hover:text-primary transition-colors leading-tight">{{ option.label }}</span>
+      </label>
+
+      <button *ngIf="hiddenCount > 0 && !showAll"
+              type="button"
+              (click)="toggleShowAll()"
+              class="text-xs text-muted-foreground hover:text-primary transition-colors text-left pt-1 pl-6">
+        Show {{ hiddenCount }} more
+      </button>
+      <button *ngIf="showAll && hiddenCount > 0"
+              type="button"
+              (click)="toggleShowAll()"
+              class="text-xs text-muted-foreground hover:text-primary transition-colors text-left pt-1 pl-6">
+        Show fewer
+      </button>
+
+      <p *ngIf="options.length === 0" class="text-xs text-muted-foreground py-1">None available</p>
+    </ng-container>
   </div>
 </div>

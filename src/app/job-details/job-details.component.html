@@ -41,6 +41,14 @@
     <!-- Actions -->
     <div class="flex flex-wrap items-center gap-3">
 
+      <!-- Boostie apply button (Boostie script wires up the click handler) -->
+      <button *ngIf="boostieActive"
+              id="job-apply"
+              class="btn-primary"
+              data-automation-id="apply-button">
+        {{ 'APPLY_NOW' | translate }}
+      </button>
+
       <!-- Native apply (hidden when Boostie is active) -->
       <button *ngIf="!alreadyApplied && !boostieActive"
               class="btn-primary" (click)="apply()"

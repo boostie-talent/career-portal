@@ -1,45 +1,49 @@
 <!-- Loading -->
 <div *ngIf="loading && !error" class="flex items-center justify-center min-h-[60vh]">
-  <div class="h-10 w-10 animate-spin rounded-full border-4 border-border border-t-primary"></div>
+  <div class="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-foreground"></div>
 </div>
 
 <!-- Error -->
-<div *ngIf="error" class="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-destructive">
-  <lucide-angular [img]="icons.TriangleAlert" [size]="48"></lucide-angular>
-  <p>{{ 'ERROR_HAS_OCCURED' | translate }}</p>
+<div *ngIf="error" class="flex flex-col items-center justify-center min-h-[60vh] gap-3 text-destructive">
+  <lucide-angular [img]="icons.TriangleAlert" [size]="40"></lucide-angular>
+  <p class="text-sm">{{ 'ERROR_HAS_OCCURED' | translate }}</p>
 </div>
 
 <!-- Main layout -->
-<div [class.hidden]="loading || error" class="flex min-h-[calc(100vh-3.5rem)]">
+<div [class.hidden]="loading || error" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-  <!-- Sidebar overlay on mobile -->
+  <!-- Mobile sidebar overlay backdrop -->
   <div *ngIf="displaySidebar"
-       class="fixed inset-0 z-40 bg-black/50 md:hidden"
+       class="fixed inset-0 z-40 bg-black/40 md:hidden"
        (click)="toggleSidebar(false)">
   </div>
 
-  <!-- Sidebar -->
-  <aside [class.hidden]="!displaySidebar"
-         class="fixed inset-y-0 left-0 z-50 w-72 md:relative md:flex md:inset-auto md:z-auto
-                overflow-y-auto shrink-0">
-    <app-sidebar
-      (newFilter)="onSidebarFilter($event)"
-      [display]="displaySidebar"
-      (toggleSidebar)="toggleSidebar($event)"
-      class="w-full">
-    </app-sidebar>
-  </aside>
+  <div class="flex gap-10 py-8">
 
-  <!-- Job list -->
-  <main class="flex-1 min-w-0 p-4 md:p-6">
-    <app-job-list
-      [filterCount]="filterCount"
-      [filter]="listFilter"
-      [sidebarVisible]="displaySidebar"
-      (displaySidebar)="toggleSidebar($event)"
-      (showLoading)="handleListLoad($event)"
-      (showError)="handleError($event)">
-    </app-job-list>
-  </main>
+    <!-- Sidebar -->
+    <aside [class.hidden]="!displaySidebar"
+           class="fixed inset-y-0 left-0 z-50 w-72 bg-background overflow-y-auto px-6
+                  md:relative md:flex md:flex-col md:inset-auto md:z-auto md:overflow-visible
+                  md:w-56 lg:w-64 md:px-0 shrink-0 md:sticky md:top-14 md:self-start">
+      <app-sidebar
+        (newFilter)="onSidebarFilter($event)"
+        [display]="displaySidebar"
+        (toggleSidebar)="toggleSidebar($event)"
+        class="w-full">
+      </app-sidebar>
+    </aside>
 
+    <!-- Job list -->
+    <main class="flex-1 min-w-0">
+      <app-job-list
+        [filterCount]="filterCount"
+        [filter]="listFilter"
+        [sidebarVisible]="displaySidebar"
+        (displaySidebar)="toggleSidebar($event)"
+        (showLoading)="handleListLoad($event)"
+        (showError)="handleError($event)">
+      </app-job-list>
+    </main>
+
+  </div>
 </div>

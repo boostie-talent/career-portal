@@ -25,7 +25,21 @@ export class SidebarFilterComponent implements OnChanges {
   public loading: boolean = true;
   public options: FilterOption[] = [];
   public expanded: boolean = true;
+  public showAll: boolean = false;
+  readonly MAX_VISIBLE = 6;
   private fieldName!: string;
+
+  get visibleOptions(): FilterOption[] {
+    return this.showAll ? this.options : this.options.slice(0, this.MAX_VISIBLE);
+  }
+
+  get hiddenCount(): number {
+    return Math.max(0, this.options.length - this.MAX_VISIBLE);
+  }
+
+  public toggleShowAll(): void {
+    this.showAll = !this.showAll;
+  }
 
   constructor(private service: SearchService) {}
 
