@@ -1,132 +1,105 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { NgFor, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { SearchService } from '../../services/search/search.service';
-import { CheckListControl, FormUtils, NovoFormGroup, FieldInteractionApi } from 'novo-elements';
 import { IAddressListResponse, ICategoryListResponse } from '../../../typings';
+
+interface FilterOption {
+  value: string | number;
+  label: string;
+  checked: boolean;
+}
 
 @Component({
   selector: 'app-sidebar-filter',
+  standalone: true,
+  imports: [NgFor, NgIf, FormsModule],
   templateUrl: './sidebar-filter.component.html',
-  styleUrls: ['./sidebar-filter.component.scss'],
 })
 export class SidebarFilterComponent implements OnChanges {
-  @Output() public checkboxFilter: EventEmitter<any> = new EventEmitter();
+  @Output() public checkboxFilter = new EventEmitter<string[]>();
   @Input() public filter: any;
-  @Input() public field: string;
-  @Input() public title: string;
+  @Input() public field!: string;
+  @Input() public title!: string;
+
   public loading: boolean = true;
-  public control: CheckListControl;
-  public form: NovoFormGroup;
-  public viewAllOptions: boolean = false;
-  public lastSetValue: string[];
-  public options: any[];
-  public fieldName: string;
+  public options: FilterOption[] = [];
+  public expanded: boolean = true;
+  private fieldName!: string;
 
-  constructor(private service: SearchService, private formUtils: FormUtils) { }
+  constructor(private service: SearchService) {}
 
-  public ngOnChanges(changes: SimpleChanges): void {
-    switch (this.field) {
-      case 'publishedCategory(id,name)':
-        this.fieldName = 'publishedCategory';
-        break;
-      default:
-        this.fieldName = this.field;
-        break;
-    }
+  public ngOnChanges(): void {
+    this.fieldName = this.field === 'publishedCategory(id,name)' ? 'publishedCategory' : this.field;
     this.getFilterOptions();
   }
 
-  public toggleAllOptions(): void {
-    this.viewAllOptions = !this.viewAllOptions;
+  public toggle(): void {
+    this.expanded = !this.expanded;
+  }
+
+  public onCheckChange(): void {
+    const selected = this.options.filter((o) => o.checked);
+    const values = this.buildFilterValues(selected.map((o) => o.value));
+    this.checkboxFilter.emit(values);
   }
 
   private getFilterOptions(): void {
     this.loading = true;
-    this.service.getCurrentJobIds(this.filter, [this.fieldName]).subscribe(this.handleJobIdsOnSuccess.bind(this));
+    this.service.getCurrentJobIds(this.filter, [this.fieldName]).subscribe((res: any) => {
+      const ids: number[] = res.data.map((r: any) => r.id);
+      this.service.getAvailableFilterOptions(ids, this.field).subscribe((res2: any) => {
+        this.setOptions(res2);
+      });
+    });
   }
 
-  private handleJobIdsOnSuccess(res: any): void {
-    let resultIds: number[] = res.data.map((result: any) => { return result.id; });
-    this.service.getAvailableFilterOptions(resultIds, this.field).subscribe(this.setFieldOptionsOnSuccess.bind(this));
+  private setOptions(res: any): void {
+    const existing = new Set(this.options.filter((o) => o.checked).map((o) => String(o.value)));
 
-  }
-
-  private setFieldOptionsOnSuccess(res: any): void {
-    let interaction: Function;
     switch (this.field) {
       case 'address(city)':
-        this.options = res.data.map((result: IAddressListResponse) => {
-          return {
-            value: result.address.city,
-            label: `${result.address.city} (${result.idCount})`,
-          };
-        }).filter((item: any) => {
-          return item.value;
-        });
-        interaction = (API: FieldInteractionApi) => {
-          let values: string[] = [];
-          this.lastSetValue = API.getActiveValue();
-          if (API.getActiveValue()) {
-            values = API.getActiveValue().map((value: string ) => {
-              return `address.city{?^^equals}{?^^delimiter}${value}{?^^delimiter}`;
-            });
-          }
-          this.checkboxFilter.emit(values);
-        };
+        this.options = res.data
+          .filter((r: IAddressListResponse) => r.address?.city)
+          .map((r: IAddressListResponse) => ({
+            value: r.address.city,
+            label: `${r.address.city} (${r.idCount})`,
+            checked: existing.has(r.address.city),
+          }));
         break;
       case 'address(state)':
-        this.options = res.data.map((result: IAddressListResponse) => {
-          return {
-            value: result.address.state,
-            label: `${result.address.state} (${result.idCount})`,
-          };
-        }).filter((item: any) => {
-          return item.value;
-        });
-        interaction = (API: FieldInteractionApi) => {
-          let values: string[] = [];
-          this.lastSetValue = API.getActiveValue();
-          if (API.getActiveValue()) {
-            values = API.getActiveValue().map((value: string ) => {
-              return `address.state{?^^equals}{?^^delimiter}${value}{?^^delimiter}`;
-            });
-          }
-          this.checkboxFilter.emit(values);
-        };
+        this.options = res.data
+          .filter((r: IAddressListResponse) => r.address?.state)
+          .map((r: IAddressListResponse) => ({
+            value: r.address.state,
+            label: `${r.address.state} (${r.idCount})`,
+            checked: existing.has(r.address.state),
+          }));
         break;
       case 'publishedCategory(id,name)':
         this.options = res.data
-        .filter((unfilteredResult: ICategoryListResponse) => {
-          return !!unfilteredResult.publishedCategory;
-        })
-        .map((result: ICategoryListResponse) => {
-          return {
-            value: result.publishedCategory.id,
-            label: `${result.publishedCategory.name} (${result.idCount})`,
-          };
-        });
-        interaction = (API: FieldInteractionApi) => {
-          let values: string[] = [];
-          this.lastSetValue = API.getActiveValue();
-          if (API.getActiveValue()) {
-          values = API.getActiveValue().map((value: number) => {
-            return `publishedCategory.id{?^^equals}${value}`;
-          });
-          }
-          this.checkboxFilter.emit(values);
-        };
-        break;
-      default:
+          .filter((r: ICategoryListResponse) => r.publishedCategory)
+          .map((r: ICategoryListResponse) => ({
+            value: r.publishedCategory.id,
+            label: `${r.publishedCategory.name} (${r.idCount})`,
+            checked: existing.has(String(r.publishedCategory.id)),
+          }));
         break;
     }
-
-    this.control = new CheckListControl({
-      key: 'checklist',
-      options: this.options,
-      interactions: [{event: 'change', script: interaction.bind(this), invokeOnInit: false}],
-    });
-    this.formUtils.setInitialValues([this.control], {'checklist': this.lastSetValue});
-    this.form = this.formUtils.toFormGroup([this.control]);
     this.loading = false;
   }
 
+  private buildFilterValues(values: (string | number)[]): string[] {
+    if (values.length === 0) return [];
+    switch (this.field) {
+      case 'address(city)':
+        return values.map((v) => `address.city{?^^equals}{?^^delimiter}${v}{?^^delimiter}`);
+      case 'address(state)':
+        return values.map((v) => `address.state{?^^equals}{?^^delimiter}${v}{?^^delimiter}`);
+      case 'publishedCategory(id,name)':
+        return values.map((v) => `publishedCategory.id{?^^equals}${v}`);
+      default:
+        return [];
+    }
+  }
 }

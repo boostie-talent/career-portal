@@ -3,7 +3,7 @@ import { SettingsService } from '../settings/settings.service';
 
 @Injectable()
 export class AnalyticsService {
-private trackingId: string;
+private trackingId!: string;
   constructor() {
     if (SettingsService.settings.integrations.googleAnalytics) {
       this.trackingId = SettingsService.settings.integrations.googleAnalytics.trackingId;

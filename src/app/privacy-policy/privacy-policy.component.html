@@ -1,4 +1,6 @@
-<div *ngIf="!loading" [innerHTML]="data">
-
+<div class="container mx-auto max-w-3xl px-4 py-8">
+  <div *ngIf="loading" class="flex justify-center py-16">
+    <div class="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary"></div>
+  </div>
+  <article *ngIf="!loading" class="prose prose-sm max-w-none" [innerHTML]="data"></article>
 </div>
-<novo-loading *ngIf="loading"></novo-loading>

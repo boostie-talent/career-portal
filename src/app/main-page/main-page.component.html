@@ -1,12 +1,45 @@
-<novo-loading *ngIf="loading && !error"></novo-loading>
-<div class="error-state" *ngIf="error">
-  <i class="bhi-caution"></i>
-  <span>{{ 'ERROR_HAS_OCCURED'   | translate }}</span>
-</div>
-<div class="frame" [ngStyle]="{display: loading || error ? 'none': 'flex'}">
-    <app-sidebar (newFilter)="onSidebarFilter($event)" [display]="displaySidebar" (toggleSidebar)="toggleSidebar($event)" [ngStyle]="sidebarCss"></app-sidebar>
-    <div class="list">
-        <app-job-list [filterCount]="filterCount" [filter]="listFilter" [sidebarVisible]="displaySidebar" (displaySidebar)="toggleSidebar($event)" (showLoading)="handleListLoad($event)" (showError)="handleError($event)"></app-job-list>
-    </div>
+<!-- Loading -->
+<div *ngIf="loading && !error" class="flex items-center justify-center min-h-[60vh]">
+  <div class="h-10 w-10 animate-spin rounded-full border-4 border-border border-t-primary"></div>
 </div>
 
+<!-- Error -->
+<div *ngIf="error" class="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-destructive">
+  <lucide-angular [img]="icons.TriangleAlert" [size]="48"></lucide-angular>
+  <p>{{ 'ERROR_HAS_OCCURED' | translate }}</p>
+</div>
+
+<!-- Main layout -->
+<div [class.hidden]="loading || error" class="flex min-h-[calc(100vh-3.5rem)]">
+
+  <!-- Sidebar overlay on mobile -->
+  <div *ngIf="displaySidebar"
+       class="fixed inset-0 z-40 bg-black/50 md:hidden"
+       (click)="toggleSidebar(false)">
+  </div>
+
+  <!-- Sidebar -->
+  <aside [class.hidden]="!displaySidebar"
+         class="fixed inset-y-0 left-0 z-50 w-72 md:relative md:flex md:inset-auto md:z-auto
+                overflow-y-auto shrink-0">
+    <app-sidebar
+      (newFilter)="onSidebarFilter($event)"
+      [display]="displaySidebar"
+      (toggleSidebar)="toggleSidebar($event)"
+      class="w-full">
+    </app-sidebar>
+  </aside>
+
+  <!-- Job list -->
+  <main class="flex-1 min-w-0 p-4 md:p-6">
+    <app-job-list
+      [filterCount]="filterCount"
+      [filter]="listFilter"
+      [sidebarVisible]="displaySidebar"
+      (displaySidebar)="toggleSidebar($event)"
+      (showLoading)="handleListLoad($event)"
+      (showError)="handleError($event)">
+    </app-job-list>
+  </main>
+
+</div>

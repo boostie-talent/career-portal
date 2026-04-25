@@ -1,28 +1,11 @@
-import { enableProdMode } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { appConfig } from './app/app.config';
+import { AppComponent } from './app/app.component';
 
-import { AppModule } from './app/app.module';
-import { environment } from './environments/environment';
-
-if (environment.production) {
-  enableProdMode();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  platformBrowserDynamic().bootstrapModule(AppModule)
-.catch(
- (err: any) => {
-   console.log(err); // tslint:disable-line
-   const errorMsgElement: any = document.querySelector('novo-loading');
-   let message: string = 'Application initialization failed, please check your app.json file';
-   if (err) {
-       if (err.message) {
-           message = message + ': ' + err.message;
-       } else {
-           message = message + ': ' + err;
-       }
-   }
-   errorMsgElement.textContent = message;
- },
- );
+bootstrapApplication(AppComponent, appConfig).catch((err) => {
+  console.error(err);
+  const root = document.querySelector('app-root');
+  if (root) {
+    root.textContent = 'Application failed to start. Check your app.json configuration.';
+  }
 });

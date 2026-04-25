@@ -1,61 +1,59 @@
-import { Component, Input, HostBinding, OnChanges, Renderer2, Inject } from '@angular/core';
+import { Component, Input, OnChanges, Renderer2, Inject } from '@angular/core';
 import { JobBoardPost } from '@bullhorn/bullhorn-types';
 import { SettingsService } from '../services/settings/settings.service';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { DatePipe, DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-structured-seo',
-  templateUrl: './structured-seo.component.html',
-  styleUrls: ['./structured-seo.component.scss'],
+  standalone: true,
+  template: '',
 })
 export class StructuredSeoComponent implements OnChanges {
-  @Input() public jobData: JobBoardPost;
-  @HostBinding('innerHTML') public html: SafeHtml;
+  @Input() public jobData!: JobBoardPost;
+
   constructor(
-    private _renderer2: Renderer2,
+    private renderer: Renderer2,
     private datePipe: DatePipe,
-    @Inject(DOCUMENT) private _document: Document,
-    private sanitizer: DomSanitizer,
-    ) { }
+    @Inject(DOCUMENT) private document: Document,
+  ) {}
 
   public ngOnChanges(): void {
-    let jsonObject: object = {
+    const jsonObject = {
       '@context': 'https://schema.org/',
       '@type': 'JobPosting',
-      'title': this.jobData.title,
-      'description': this.jobData.publicDescription,
-      'datePosted': this.datePipe.transform(this.jobData.dateLastPublished, 'long'),
-      'hiringOrganization': {
+      title: this.jobData.title,
+      description: this.jobData.publicDescription,
+      datePosted: this.datePipe.transform(this.jobData.dateLastPublished, 'long'),
+      hiringOrganization: {
         '@type': 'Organization',
-        'name': SettingsService.settings.companyName,
-        'sameAs': SettingsService.settings.companyUrl,
-        'logo': SettingsService.settings.companyLogoPath,
+        name: SettingsService.settings.companyName,
+        sameAs: SettingsService.settings.companyUrl,
+        logo: SettingsService.settings.companyLogoPath,
       },
-      'jobLocation': {
+      jobLocation: {
         '@type': 'Place',
-        'address': {
+        address: {
           '@type': 'PostalAddress',
-          'addressLocality': this.jobData.address.city,
-          'addressRegion': this.jobData.address.state,
-          'postalCode': this.jobData.address.zip,
+          addressLocality: this.jobData.address?.city,
+          addressRegion: this.jobData.address?.state,
+          postalCode: (this.jobData.address as any)?.zip,
         },
       },
-      'baseSalary': {
+      baseSalary: {
         '@type': 'MonetaryAmount',
-        'value': {
+        value: {
           '@type': 'QuantitativeValue',
-          'value': this.jobData.salary,
-          'unitText': this.jobData.salaryUnit,
+          value: this.jobData.salary,
+          unitText: this.jobData.salaryUnit,
         },
       },
     };
-    let s: any = this._renderer2.createElement('script');
-    s.type = `application/ld+json`;
-    s.text = JSON.stringify(jsonObject);
+
     if (SettingsService.isServer) {
-      this._renderer2.appendChild(this._document.body, s);
+      const s = this.renderer.createElement('script');
+      s.type = 'application/ld+json';
+      s.text = JSON.stringify(jsonObject);
+      this.renderer.appendChild(this.document.body, s);
     }
   }
-
 }

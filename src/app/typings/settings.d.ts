@@ -9,13 +9,18 @@ export interface ISettings {
   minUploadSize: number;
   maxRelatedJobs: number;
   maxUploadSize: number;
+  darkTheme: boolean;
   service: IServiceSettings;
   additionalJobCriteria: IAdditionalJobCriteria;
   integrations: IIntegrationSettings;
-  darkTheme: boolean;
   eeoc: IEeoc;
   privacyConsent: IPrivacyConsent;
   languageDropdownOptions: ILanguageDropdownOptions;
+  boostie: IBoostieSettings;
+}
+
+interface IBoostieSettings {
+  clientId: string | null;
 }
 
 interface IServiceSettings {

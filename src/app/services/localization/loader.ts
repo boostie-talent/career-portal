@@ -1,52 +1,37 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { makeStateKey, StateKey, TransferState } from '@angular/platform-browser';
+import { TransferState, makeStateKey, StateKey } from '@angular/core';
 import { TranslateLoader } from '@ngx-translate/core';
-import { from, Observable } from 'rxjs';
+import { from, Observable, lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class TranslationLoader implements TranslateLoader {
-  constructor(private http: HttpClient,  private transferState: TransferState) {}
+  constructor(private http: HttpClient, private transferState: TransferState) {}
 
-  public getTranslation(locale: string): Observable<{}> {
-    // Split out the language code from the locale
-    const languageCode: string = (locale.split('-')[0] || '').toLowerCase();
+  public getTranslation(locale: string): Observable<object> {
+    const languageCode = (locale.split('-')[0] || '').toLowerCase();
     return from(this.getLanguageAndLocale(languageCode, locale));
   }
 
   private async translationFetcher(locale: string): Promise<object> {
-    return await this.http.get(`i18n/${locale}.json`).toPromise();
+    return lastValueFrom(this.http.get<object>(`i18n/${locale}.json`));
   }
 
-  private async getLanguageAndLocale(
-    language: string,
-    locale: string,
-  ): Promise<object> {
-    const languageKey: StateKey<number> = makeStateKey<number>(
-      'transfer-translate-' + language,
-    );
-    const fallbackKey: StateKey<number> = makeStateKey<number>(
-      'transfer-translate-' + locale,
-    );
+  private async getLanguageAndLocale(language: string, locale: string): Promise<object> {
+    const languageKey: StateKey<object> = makeStateKey<object>('transfer-translate-' + language);
+    const fallbackKey: StateKey<object> = makeStateKey<object>('transfer-translate-' + locale);
 
-    let fallbackTranslations: any = {};
-    let translations: any = {};
+    let fallbackTranslations: object = {};
+    let translations: object = {};
+
     try {
-      fallbackTranslations = this.transferState.get(fallbackKey, null);
-      if (!fallbackTranslations) {
-        fallbackTranslations = await this.translationFetcher(language);
-      }
-    } catch (e) {
-      fallbackTranslations = {};
-    }
+      fallbackTranslations = this.transferState.get(fallbackKey, null) ?? await this.translationFetcher(language);
+    } catch { fallbackTranslations = {}; }
+
     try {
-      translations = this.transferState.get(languageKey, null);
-      if (!translations) {
-        translations = await this.translationFetcher(locale);
-      }
-    } catch (e) {
-      translations = {};
-    }
+      translations = this.transferState.get(languageKey, null) ?? await this.translationFetcher(locale);
+    } catch { translations = {}; }
+
     return { ...fallbackTranslations, ...translations };
   }
 }

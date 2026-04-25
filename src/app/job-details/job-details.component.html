@@ -1,28 +1,82 @@
-<novo-loading *ngIf="loading"></novo-loading>
-<app-structured-seo *ngIf="!loading" [jobData]="job"></app-structured-seo>
-<div class="background" *ngIf="!loading">
-    <div class="job-container" [ngClass]="{'safari-scroll': isSafariAgent}">
-        <button theme="dialogue" (click)="goToJobList()" icon="previous" side="left" data-automation-id="back-button">{{ 'BACK'   | translate }}</button>
-        <div class="job-header">
-            <span class="job-title">{{ job.title }}</span>
-            <br/>
-            <span class="category" *ngIf="job.publishedCategory && showCategory">
-                {{ job.publishedCategory?.name }}
-            </span>
-            <div class="job-info-container">
-                <app-info-chips [job]="job"></app-info-chips>
-            </div>
-        </div>
-        <div class="job-description-text" [innerHTML]="job.publicDescription"></div>
-        <div class="share">
-            <button theme="primary" *ngIf="!alreadyApplied" (click)="apply()" data-automation-id="apply-button">{{ 'APPLY_NOW'   | translate }}</button>
-            <button theme="primary" *ngIf="alreadyApplied" disabled="true" data-automation-id="applied-button">{{ 'ALREADY_APPLIED'   | translate }}</button>
-            <button theme="icon" icon="email" (click)="emailLink()" *ngIf="showShareButtons"></button>
-            <button theme="icon" icon="twitter" (click)="shareTwitter()" *ngIf="showShareButtons"></button>
-            <button theme="icon" icon="facebook" (click)="shareFacebook()" *ngIf="showShareButtons"></button>
-            <button theme="icon" icon="linkedin" (click)="shareLinkedin()" *ngIf="showShareButtons"></button>
-            <button theme="dialogue" icon="share" (click)="toggleShareButtons()" *ngIf="!showShareButtons">{{ 'SHARE_POST'   | translate }}</button>
-            <button theme="icon" icon="print" (click)="print()"></button>
-        </div>
-    </div>
+<!-- Loading skeleton -->
+<div *ngIf="loading" class="container mx-auto py-8 max-w-3xl px-4">
+  <div class="h-4 w-24 rounded bg-muted animate-pulse mb-6"></div>
+  <div class="h-8 w-2/3 rounded bg-muted animate-pulse mb-3"></div>
+  <div class="h-4 w-1/4 rounded bg-muted animate-pulse mb-6"></div>
+  <div class="space-y-3">
+    <div class="h-3 w-full rounded bg-muted animate-pulse"></div>
+    <div class="h-3 w-full rounded bg-muted animate-pulse"></div>
+    <div class="h-3 w-5/6 rounded bg-muted animate-pulse"></div>
+  </div>
 </div>
+
+<ng-container *ngIf="!loading">
+  <app-structured-seo [jobData]="job"></app-structured-seo>
+
+  <div class="container mx-auto py-8 max-w-3xl px-4">
+
+    <!-- Back button -->
+    <button type="button" class="btn-ghost text-sm mb-6" (click)="goToJobList()" data-automation-id="back-button">
+      <lucide-angular [img]="icons.ArrowLeft" [size]="16" class="mr-1.5"></lucide-angular>
+      {{ 'BACK' | translate }}
+    </button>
+
+    <!-- Job header -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-foreground">{{ job.title }}</h1>
+      <p *ngIf="job.publishedCategory && showCategory" class="text-muted-foreground mt-1">
+        {{ job.publishedCategory?.name }}
+      </p>
+      <div class="mt-3">
+        <app-info-chips [job]="job"></app-info-chips>
+      </div>
+    </div>
+
+    <!-- Boostie job ID anchor (read by boostie.js) -->
+    <div *ngIf="boostieActive" id="jobId" style="display:none">{{ job.id }}</div>
+
+    <!-- Job description -->
+    <div class="prose prose-sm max-w-none mb-8 text-foreground" [innerHTML]="job.publicDescription"></div>
+
+    <!-- Actions -->
+    <div class="flex flex-wrap items-center gap-3">
+
+      <!-- Native apply (hidden when Boostie is active) -->
+      <button *ngIf="!alreadyApplied && !boostieActive"
+              class="btn-primary" (click)="apply()"
+              data-automation-id="apply-button">
+        {{ 'APPLY_NOW' | translate }}
+      </button>
+      <button *ngIf="alreadyApplied && !boostieActive"
+              class="btn-primary opacity-50 cursor-not-allowed"
+              disabled
+              data-automation-id="applied-button">
+        {{ 'ALREADY_APPLIED' | translate }}
+      </button>
+
+      <!-- Share icons -->
+      <button *ngIf="showShareButtons" class="btn-icon" (click)="emailLink()">
+        <lucide-angular [img]="icons.Mail" [size]="16"></lucide-angular>
+      </button>
+      <button *ngIf="showShareButtons" class="btn-icon" (click)="shareTwitter()">
+        <lucide-angular [img]="icons.Twitter" [size]="16"></lucide-angular>
+      </button>
+      <button *ngIf="showShareButtons" class="btn-icon" (click)="shareFacebook()">
+        <lucide-angular [img]="icons.Facebook" [size]="16"></lucide-angular>
+      </button>
+      <button *ngIf="showShareButtons" class="btn-icon" (click)="shareLinkedin()">
+        <lucide-angular [img]="icons.Linkedin" [size]="16"></lucide-angular>
+      </button>
+
+      <button *ngIf="!showShareButtons" class="btn-ghost text-sm" (click)="toggleShareButtons()">
+        <lucide-angular [img]="icons.Share2" [size]="16" class="mr-1.5"></lucide-angular>
+        {{ 'SHARE_POST' | translate }}
+      </button>
+
+      <button class="btn-icon" (click)="print()">
+        <lucide-angular [img]="icons.Printer" [size]="16"></lucide-angular>
+      </button>
+    </div>
+
+  </div>
+</ng-container>

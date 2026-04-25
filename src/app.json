@@ -95,11 +95,16 @@
       }
     ],
     "showCategory": true,
-    "keywordSearchFields": ["publicDescription", "title"]
+    "keywordSearchFields": [
+      "publicDescription",
+      "title"
+    ]
   },
   "additionalJobCriteria": {
     "field": "[ FILTER FIELD HERE ]",
-    "values": ["[ FILTER VALUE HERE ]"],
+    "values": [
+      "[ FILTER VALUE HERE ]"
+    ],
     "sort": "-dateLastPublished"
   },
   "integrations": {
@@ -119,5 +124,8 @@
     "consentCheckbox": true,
     "sidebarLink": true,
     "privacyPolicyUrl": "/privacy"
+  },
+  "boostie": {
+    "clientId": null
   }
 }

@@ -1,17 +1,16 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { NgFor, NgIf, DatePipe, CurrencyPipe, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { JobBoardPost } from '@bullhorn/bullhorn-types';
-import { SettingsService } from 'src/app/services/settings/settings.service';
+import { SettingsService } from '../../services/settings/settings.service';
 
 @Component({
   selector: 'app-info-chips',
+  standalone: true,
+  imports: [NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault, DatePipe, CurrencyPipe],
   templateUrl: './info-chips.component.html',
-  styleUrls: ['./info-chips.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InfoChipsComponent {
-  @Input() public job: JobBoardPost;
-  public jobInfoChips: [string|any]  = SettingsService.settings.service.jobInfoChips;
-
-  constructor() {}
-
+  @Input() public job!: JobBoardPost;
+  public jobInfoChips: any[] = SettingsService.settings.service.jobInfoChips;
 }

@@ -1,7 +1,8 @@
 import { get } from 'https';
 import { IncomingMessage } from 'http';
 import { JobBoardPost } from '@bullhorn/bullhorn-types';
-import * as jsonxml from 'jsontoxml';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const jsonxml = require('jsontoxml');
 import { ISettings } from './src/app/typings/settings';
 
 export function generateSitemap(appConfig: ISettings, res: any, req: any): any {
@@ -17,7 +18,7 @@ export function generateSitemap(appConfig: ISettings, res: any, req: any): any {
     response.on('end', function (): any {
       let jobs: JobBoardPost[] = JSON.parse(body).data;
       jobs.forEach((job: JobBoardPost) => {
-        let postDate: Date = new Date(job.dateLastPublished);
+        let postDate: Date = new Date(job.dateLastPublished as any);
         sitemapUrls.push({
           name: 'url',
           children: [
@@ -48,15 +49,15 @@ export function generateRss(appConfig: ISettings, res: any, req: any): any {
     response.on('end', function (): any {
       let jobs: JobBoardPost[] = JSON.parse(body).data;
       jobs.forEach((job: JobBoardPost) => {
-        let postDate: Date = new Date(job.dateLastPublished);
+        let postDate: Date = new Date(job.dateLastPublished as any);
         jobListings.children.push({
           name: 'item',
           children: [
             { name: 'title', text: escapeHtml(job.title) },
             { name: 'description', text: escapeHtml(job.publicDescription) },
-            { name: 'city', text: job.address.city },
-            { name: 'state', text: job.address.state },
-            { name: 'zip', text: job.address.zip },
+            { name: 'city', text: job.address?.city },
+            { name: 'state', text: job.address?.state },
+            { name: 'zip', text: (job.address as any)?.zip },
             { name: 'pubDate', text: postDate.toUTCString() },
             { name: 'link', text: `${req.protocol}://${req.hostname}${req.originalUrl.replace('/feed', '/jobs')}/${job.id}`},
           ],

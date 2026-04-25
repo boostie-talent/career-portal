@@ -112,7 +112,7 @@ export class SearchService {
     let additionalFilter: string = '';
     for (let key in filter) {
       if (!ignoreFields.includes(key)) {
-        let filterValue: string | string[] = filter[key];
+        let filterValue: string | string[] = (filter as any)[key];
         if (typeof filterValue === 'string') {
           additionalFilter += ` AND (${filterValue})`;
         } else if (filterValue.length) {

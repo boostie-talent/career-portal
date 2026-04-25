@@ -15,17 +15,17 @@
   "careersUrl": "",
   "defaultLocale": "en-US",
   "supportedLocales": [
-      "en-US",
-      "en-GB",
-      "en",
-      "fr-FR",
-      "fr",
-      "es",
-      "de",
-      "it",
-      "nl",
-      "ru",
-      "zh-CN"
+    "en-US",
+    "en-GB",
+    "en",
+    "fr-FR",
+    "fr",
+    "es",
+    "de",
+    "it",
+    "nl",
+    "ru",
+    "zh-CN"
   ],
   "minUploadSize": 4096,
   "maxRelatedJobs": 5,
@@ -91,5 +91,8 @@
     "consentCheckbox": true,
     "sidebarLink": true,
     "privacyPolicyUrl": "/privacy"
+  },
+  "boostie": {
+    "clientId": null
   }
 }

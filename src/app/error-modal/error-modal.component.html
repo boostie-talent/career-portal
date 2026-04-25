@@ -1,5 +1,20 @@
-<novo-notification type="error" data-automation-id="error-modal">
-  <h1>{{ params['title'] }}</h1>
-  <h2>{{ params['message'] }}</h2>
-  <button theme="primary" (click)="close()" data-automation-id="error-modal-confirm" icon="check">{{ 'OKAY'   | translate }}</button>
-</novo-notification>
+<div class="bg-background rounded-lg shadow-lg p-6 w-full max-w-md" data-automation-id="error-modal">
+  <div class="flex items-start gap-4 mb-4">
+    <div class="shrink-0 text-destructive">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+        <path d="M12 9v4"/><path d="M12 17h.01"/>
+      </svg>
+    </div>
+    <div>
+      <h2 class="font-semibold text-lg text-foreground">{{ data.title }}</h2>
+      <p class="text-muted-foreground mt-1">{{ data.message }}</p>
+    </div>
+  </div>
+  <div class="flex justify-end">
+    <button class="btn-primary" (click)="close()" data-automation-id="error-modal-confirm">
+      {{ 'OKAY' | translate }}
+    </button>
+  </div>
+</div>

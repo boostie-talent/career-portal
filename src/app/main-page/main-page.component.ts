@@ -1,20 +1,23 @@
 import { Component } from '@angular/core';
+import { NgIf, NgStyle } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
+import { LucideAngularModule, TriangleAlert } from 'lucide-angular';
+import { SidebarComponent } from '../sidebar/sidebar.component';
+import { JobListComponent } from '../job-list/job-list.component';
 
 @Component({
   selector: 'app-main-page',
+  standalone: true,
+  imports: [NgIf, NgStyle, TranslateModule, LucideAngularModule, SidebarComponent, JobListComponent],
   templateUrl: './main-page.component.html',
-  styleUrls: ['./main-page.component.scss'],
 })
 export class MainPageComponent {
-
+  public icons = { TriangleAlert };
   public filterCount: number = 1;
   public listFilter: any = {};
   public displaySidebar: boolean = false;
   public loading: boolean = true;
   public error: boolean = false;
-  public sidebarCss: object = {};
-
-  constructor() { }
 
   public onSidebarFilter(filter: any): void {
     this.listFilter = filter;
@@ -23,15 +26,6 @@ export class MainPageComponent {
 
   public toggleSidebar(value: boolean): void {
     this.displaySidebar = value;
-    if (value) {
-      this.sidebarCss = {
-        position: 'absolute',
-        width: '60%',
-        'max-width': 'unset',
-      };
-    } else {
-      this.sidebarCss = {};
-    }
   }
 
   public handleListLoad(loading: boolean): void {
@@ -41,5 +35,4 @@ export class MainPageComponent {
   public handleError(showError: boolean): void {
     this.error = showError;
   }
-
 }

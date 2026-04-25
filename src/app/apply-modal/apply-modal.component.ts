@@ -1,269 +1,168 @@
-import { Component, OnInit } from '@angular/core';
-import {
-  NovoFormGroup,
-  FormUtils,
-  NovoModalRef,
-  NovoModalParams,
-  TextBoxControl,
-  FileControl,
-  PickerControl,
-  SelectControl,
-  NovoToastService,
-  CheckboxControl,
-  FieldInteractionApi,
-} from 'novo-elements';
-import { SettingsService } from '../services/settings/settings.service';
-import { AnalyticsService } from '../services/analytics/analytics.service';
-import { ApplyService } from '../services/apply/apply.service';
+import { Component, OnInit, Inject } from '@angular/core';
+import { NgIf, NgFor } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { DialogRef, DIALOG_DATA } from '@angular/cdk/dialog';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { LucideAngularModule, X, Check } from 'lucide-angular';
 import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { SettingsService } from '../services/settings/settings.service';
+import { ApplyService } from '../services/apply/apply.service';
+import { AnalyticsService } from '../services/analytics/analytics.service';
+
+export interface ApplyModalData {
+  job: any;
+  source: string;
+}
 
 @Component({
   selector: 'app-apply-modal',
+  standalone: true,
+  imports: [NgIf, NgFor, ReactiveFormsModule, TranslateModule, LucideAngularModule],
   templateUrl: './apply-modal.component.html',
-  styleUrls: ['./apply-modal.component.scss'],
 })
 export class ApplyModalComponent implements OnInit {
-
-  public job: any;
-  public source: string;
-  public firstName: TextBoxControl;
-  public lastName: TextBoxControl;
-  public email: TextBoxControl;
-  public phoneNumber: TextBoxControl;
-  public form: NovoFormGroup;
-  public genderRaceEthnicity: any;
-  public veteran: any;
-  public disability: any;
-  public resume: FileControl;
-  public loading: boolean = true;
-  public hasError: boolean = false;
-  public formControls: any[] = [];
-  public eeocControls: any = [];
-  public consentControl: any;
+  public icons = { X, Check };
+  public form!: FormGroup;
+  public selectedFile: File | null = null;
+  public fileError: string = '';
   public applying: boolean = false;
-  public consentCheckbox: boolean = SettingsService.settings.privacyConsent.consentCheckbox;
-  public showCategory: boolean  = SettingsService.settings.service.showCategory;
-  public isIos: boolean = SettingsService.isIos;
-  private APPLIED_JOBS_KEY: string = 'APPLIED_JOBS_KEY';
+  public hasError: boolean = false;
 
-  constructor(private formUtils: FormUtils,
-              public params: NovoModalParams,
-              private modalRef: NovoModalRef,
-              private applyService: ApplyService,
-              private analytics: AnalyticsService,
-              private toaster: NovoToastService,
-              private router: Router,
-              private translate: TranslateService,
-               ) { this.toaster.parentViewContainer = this.params['viewContainer']; }
+  public showCategory: boolean = SettingsService.settings.service.showCategory;
+  public consentCheckbox: boolean = SettingsService.settings.privacyConsent?.consentCheckbox ?? false;
+  public showEeoc: boolean = false;
+  public eeoc = SettingsService.settings.eeoc ?? {};
+
+  public genderOptions = [
+    { value: 'M', labelKey: 'EEOC.GENDER_MALE' },
+    { value: 'F', labelKey: 'EEOC.GENDER_FEMALE' },
+    { value: 'D', labelKey: 'EEOC.GENDER_ND' },
+  ];
+  public ethnicityOptions = [
+    { value: 'HL', labelKey: 'EEOC.RACE_ETHNICITY_HL' },
+    { value: 'WH', labelKey: 'EEOC.RACE_ETHNICITY_WH' },
+    { value: 'BL', labelKey: 'EEOC.RACE_ETHNICITY_BL' },
+    { value: 'AS', labelKey: 'EEOC.RACE_ETHNICITY_AS' },
+    { value: 'NP', labelKey: 'EEOC.RACE_ETHNICITY_NP' },
+    { value: 'IA', labelKey: 'EEOC.RACE_ETHNICITY_IA' },
+    { value: 'DN', labelKey: 'EEOC.RACE_ETHNICITY_DN' },
+  ];
+  public veteranOptions = [
+    { value: 'P', labelKey: 'EEOC.VETERAN_P' },
+    { value: 'V', labelKey: 'EEOC.VETERAN_V' },
+    { value: 'N', labelKey: 'EEOC.VETERAN_N' },
+    { value: 'D', labelKey: 'EEOC.VETERAN_D' },
+  ];
+  public disabilityOptions = [
+    { value: 'Y', labelKey: 'EEOC.DISABILITY_Y' },
+    { value: 'N', labelKey: 'EEOC.DISABILITY_N' },
+    { value: 'D', labelKey: 'EEOC.DISABILITY_D' },
+  ];
+
+  private readonly APPLIED_JOBS_KEY = 'APPLIED_JOBS_KEY';
+
+  constructor(
+    public dialogRef: DialogRef<void>,
+    @Inject(DIALOG_DATA) public data: ApplyModalData,
+    private fb: FormBuilder,
+    private applyService: ApplyService,
+    private analytics: AnalyticsService,
+    private router: Router,
+    private translate: TranslateService,
+  ) {}
 
   public ngOnInit(): void {
-    this.job = this.params['job'];
-    this.source = this.params['source'];
-    this.setupForm();
+    this.showEeoc = !!(this.eeoc.genderRaceEthnicity || this.eeoc.veteran || this.eeoc.disability);
+    this.buildForm();
   }
-  public setupForm(): void {
-    this.firstName = new TextBoxControl({
-      key: 'firstName',
-      label: this.translate.instant('FIRST_NAME'),
-      required: true,
-      hidden: false,
-      value: '',
-    });
-    this.lastName = new TextBoxControl({
-      key: 'lastName',
-      label: this.translate.instant('LAST_NAME'),
-      required: true,
-      hidden: false,
-      value: '',
-    });
-    this.email = new TextBoxControl({
-      key: 'email',
-      label: this.translate.instant('EMAIL'),
-      type: 'email',
-      required: true,
-      hidden: false,
-      value: '',
-    });
-    this.phoneNumber = new TextBoxControl({
-      key: 'phone',
-      label: this.translate.instant('PHONE'),
-      type: 'tel',
-      required: false,
-      hidden: false,
-      value: '',
-    });
-    this.genderRaceEthnicity = [
-      new SelectControl({
-        key: 'gender',
-        label: this.translate.instant('EEOC.GENDER_LABEL'),
-        required: SettingsService.settings.eeoc.genderRaceEthnicity,
-        hidden: false,
-        options: [
-          { value: 'M', label: this.translate.instant('EEOC.GENDER_MALE') },
-          { value: 'F', label: this.translate.instant('EEOC.GENDER_FEMALE')},
-          { value: 'D', label: this.translate.instant('EEOC.GENDER_ND')},
-        ],
-      }), new PickerControl({
-        key: 'ethnicity',
-        label: this.translate.instant('EEOC.RACE_ETHNICITY_LABEL'),
-        required: SettingsService.settings.eeoc.genderRaceEthnicity,
-        hidden: false,
-        multiple: true,
-        placeholder: this.translate.instant('EEOC.SELECT_ALL'),
-        config: {
-          options: [
-            { value: 'HL', label: this.translate.instant('EEOC.RACE_ETHNICITY_HL') },
-            { value: 'WH', label: this.translate.instant('EEOC.RACE_ETHNICITY_WH') },
-            { value: 'BL', label: this.translate.instant('EEOC.RACE_ETHNICITY_BL') },
-            { value: 'AS', label: this.translate.instant('EEOC.RACE_ETHNICITY_AS') },
-            { value: 'NP', label: this.translate.instant('EEOC.RACE_ETHNICITY_NP') },
-            { value: 'IA', label: this.translate.instant('EEOC.RACE_ETHNICITY_IA') },
-            { value: 'DN', label: this.translate.instant('EEOC.RACE_ETHNICITY_DN') },
-          ],
-        },
-      }),
-    ];
-    this.veteran = [
-      new SelectControl({
-        key: 'veteran',
-        label: this.translate.instant('EEOC.VETERAN_LABEL'),
-        description: this.translate.instant('EEOC.VETERAN_DESCRIPTION'),
-        required: SettingsService.settings.eeoc.veteran,
-        hidden: false,
-        options: [
-          { value: 'P', label: this.translate.instant('EEOC.VETERAN_P') },
-          { value: 'V', label: this.translate.instant('EEOC.VETERAN_V')},
-          { value: 'N', label: this.translate.instant('EEOC.VETERAN_N')},
-          { value: 'D', label: this.translate.instant('EEOC.VETERAN_D')},
-        ],
-      }),
-    ];
-    this.disability = [
-      new SelectControl({
-        key: 'disability',
-        label: this.translate.instant('EEOC.DISABILITY_LABEL'),
-        description: this.translate.instant('EEOC.DISABILITY_DESCRIPTION'),
-        required: SettingsService.settings.eeoc.disability,
-        hidden: false,
-        options: [
-          { value: 'Y', label: this.translate.instant('EEOC.DISABILITY_Y') },
-          { value: 'N', label: this.translate.instant('EEOC.DISABILITY_N')},
-          { value: 'D', label: this.translate.instant('EEOC.DISABILITY_D')},
-        ],
-      }),
-    ];
-    this.resume = new FileControl({
-      key: 'resume',
-      required: true,
-      hidden: false,
-      description: `${this.translate.instant('ACCEPTED_RESUME')} ${SettingsService.settings.acceptedResumeTypes.toString()}`,
-    });
 
-    this.formControls = [this.firstName, this.lastName, this.email, this.phoneNumber, this.resume];
+  private buildForm(): void {
+    this.form = this.fb.group({
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      phone: [''],
+      gender: [''],
+      ethnicity: [[]],
+      veteran: [''],
+      disability: [''],
+      consent: [false, this.consentCheckbox ? Validators.requiredTrue : []],
+    });
+  }
 
-    let eeoc: any = SettingsService.settings.eeoc;
-    for (let field in eeoc) {
-      if (eeoc[field]) {
-        this.eeocControls.push(...this[field]);
+  public onFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) {
+      const file = input.files[0];
+      const accepted = SettingsService.settings.acceptedResumeTypes ?? [];
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+      if (accepted.length && !accepted.includes(ext)) {
+        this.fileError = `Accepted types: ${accepted.join(', ')}`;
+        this.selectedFile = null;
+      } else if (file.size > (SettingsService.settings.maxUploadSize ?? 5242880)) {
+        this.fileError = 'File too large';
+        this.selectedFile = null;
+      } else {
+        this.fileError = '';
+        this.selectedFile = file;
       }
     }
-
-    this.consentControl = new CheckboxControl({
-      key: 'consent',
-      required: SettingsService.settings.privacyConsent.consentCheckbox,
-      hidden: false,
-      interactions: [
-        {
-          event: 'change',
-          script: (FAPI: FieldInteractionApi) => {
-            if (!FAPI.getValue('consent')) {
-              FAPI.markAsInvalid('consent');
-            }
-          },
-        },
-      ],
-    });
-
-    this.form = this.formUtils.toFormGroup([...this.formControls, ...this.eeocControls, this.consentControl]);
-    this.loading = false;
   }
 
-  public close(applied: boolean = false): void {
-    if (applied) {
-      this.analytics.trackEvent(`Success applying to job ${this.job.id}`);
-    } else {
-      this.analytics.trackEvent(`Close apply form without applying for job ${this.job.id}`);
-    }
-    this.modalRef.close(undefined);
+  public toggleEthnicity(value: string): void {
+    const current: string[] = this.form.value.ethnicity ?? [];
+    const updated = current.includes(value)
+      ? current.filter((v) => v !== value)
+      : [...current, value];
+    this.form.patchValue({ ethnicity: updated });
+  }
+
+  public close(): void {
+    this.analytics.trackEvent(`Close apply form without applying for job ${this.data.job.id}`);
+    this.dialogRef.close();
   }
 
   public save(): void {
-    if (this.form.valid) {
-      this.applying = true;
-      this.analytics.trackEvent(`Apply to Job: ${this.job.id}`);
-      let requestParams: any = {
-        firstName: encodeURIComponent(this.form.value.firstName),
-        lastName: encodeURIComponent(this.form.value.lastName),
-        email: encodeURIComponent(this.form.value.email),
-        phone: encodeURIComponent(this.form.value.phone || ''),
-        format: this.form.value.resume[0].name.substring(this.form.value.resume[0].name.lastIndexOf('.') + 1),
-      };
+    if (!this.form.valid || !this.selectedFile) return;
+    this.applying = true;
+    this.analytics.trackEvent(`Apply to Job: ${this.data.job.id}`);
 
-      if (this.form.value.gender) {
-        requestParams.gender = encodeURIComponent(this.form.value.gender);
-      }
-      if (this.form.value.ethnicity) {
-        requestParams.ethnicity = encodeURIComponent(this.form.value.ethnicity);
-      }
-      if (this.form.value.veteran) {
-        requestParams.veteran = encodeURIComponent(this.form.value.veteran);
-      }
-      if (this.form.value.disability) {
-        requestParams.disability = encodeURIComponent(this.form.value.disability);
-      }
-      if (this.source) {
-        requestParams.source = this.source;
-      }
+    const v = this.form.value;
+    const format = this.selectedFile.name.split('.').pop() ?? '';
+    const params: any = {
+      firstName: encodeURIComponent(v.firstName),
+      lastName: encodeURIComponent(v.lastName),
+      email: encodeURIComponent(v.email),
+      phone: encodeURIComponent(v.phone || ''),
+      format,
+    };
+    if (v.gender) params.gender = encodeURIComponent(v.gender);
+    if (v.ethnicity?.length) params.ethnicity = encodeURIComponent(v.ethnicity.join(','));
+    if (v.veteran) params.veteran = encodeURIComponent(v.veteran);
+    if (v.disability) params.disability = encodeURIComponent(v.disability);
+    if (this.data.source) params.source = this.data.source;
 
-      let formData: FormData = new FormData();
-      formData.append('resume', this.form.value.resume[0].file);
-      this.applyService.apply(this.job.id, requestParams, formData).subscribe(this.applyOnSuccess.bind(this), this.applyOnFailure.bind(this) );
-    }
+    const formData = new FormData();
+    formData.append('resume', this.selectedFile);
+
+    this.applyService.apply(this.data.job.id, params, formData).subscribe({
+      next: () => this.onSuccess(),
+      error: () => { this.hasError = true; this.applying = false; },
+    });
   }
 
   public viewPrivacyPolicy(): void {
-    const url: string = SettingsService.settings.privacyConsent.privacyPolicyUrl;
-    if (url === '/privacy') {
-      this.router.navigate([url]);
-    } else {
-      window.open(url);
-    }  }
-
-  private applyOnSuccess(res: any): void {
-    let toastOptions: any = {
-      theme: 'success',
-      icon: 'check',
-      title: this.translate.instant('THANK_YOU'),
-      message: this.translate.instant('YOU_WILL_BE_CONTACTED'),
-      position: 'growlTopRight',
-      hideDelay: 3000,
-    };
-    this.toaster.alert(toastOptions);
-    let alreadyAppliedJobs: any = sessionStorage.getItem(this.APPLIED_JOBS_KEY);
-    if (alreadyAppliedJobs) {
-      let alreadyAppliedJobsArray: any = JSON.parse(alreadyAppliedJobs);
-      alreadyAppliedJobsArray.push(this.job.id);
-      sessionStorage.setItem(this.APPLIED_JOBS_KEY, JSON.stringify(alreadyAppliedJobsArray));
-    } else {
-      sessionStorage.setItem(this.APPLIED_JOBS_KEY, JSON.stringify([this.job.id]));
-    }
-    this.applying = false;
-    this.close(true);
+    const url = SettingsService.settings.privacyConsent?.privacyPolicyUrl;
+    if (url === '/privacy') { this.router.navigate([url]); } else if (url) { window.open(url); }
   }
 
-  private applyOnFailure(res: any): void {
-    this.hasError = true;
+  private onSuccess(): void {
+    const stored = sessionStorage.getItem(this.APPLIED_JOBS_KEY);
+    const list = stored ? JSON.parse(stored) : [];
+    list.push(this.data.job.id);
+    sessionStorage.setItem(this.APPLIED_JOBS_KEY, JSON.stringify(list));
     this.applying = false;
+    this.analytics.trackEvent(`Success applying to job ${this.data.job.id}`);
+    this.dialogRef.close();
   }
 }

@@ -1,6 +1,11 @@
-<header [title]="title" icon="company" theme="neutral" condensed="true">
-  <div class="entity-header" novo-title></div>
-</header>
-<div>
+<nav class="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+  <div class="container mx-auto flex h-14 items-center gap-4 px-4">
+    <a [href]="companyUrl || '/'" class="flex items-center gap-2 shrink-0">
+      <img *ngIf="companyLogoPath" [src]="companyLogoPath" [alt]="companyName" class="h-8 w-auto" />
+      <span class="font-semibold text-foreground">{{ companyName }}</span>
+    </a>
+  </div>
+</nav>
+<main>
   <router-outlet></router-outlet>
-</div>
+</main>
