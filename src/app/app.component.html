@@ -2,7 +2,7 @@
   <div class="max-w-5xl mx-auto flex h-14 items-center gap-5 px-4 sm:px-6 lg:px-8">
     <a [href]="companyUrl || '/'" class="flex items-center gap-2.5 shrink-0">
       <img *ngIf="companyLogoPath" [src]="companyLogoPath" [alt]="companyName" class="h-7 w-auto" />
-      <span class="font-bold text-foreground">{{ companyName }}</span>
+      <!-- <span class="font-bold text-foreground">{{ companyName }}</span> -->
     </a>
     <a *ngIf="companyUrl" [href]="companyUrl" target="_blank" rel="noopener noreferrer"
        class="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline-flex items-center gap-1">
