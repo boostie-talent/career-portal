@@ -191,6 +191,43 @@ scripts/
 
 ---
 
+## Clean URLs (removing the `#` from links)
+
+By default, static builds use Angular's hash-based routing (`/#/jobs/...`). This works on any static host without configuration, but isn't ideal for sharing or SEO.
+
+To get clean URLs (`/jobs/...`), you need **one redirect rule** that tells your host to serve `index.html` for all paths. The Angular change is a one-liner — remove `withHashLocation()` from the router config in `src/app/app.config.ts`.
+
+### Netlify
+
+Add `public/_redirects`:
+
+```
+/*  /index.html  200
+```
+
+### Vercel
+
+Add `vercel.json`:
+
+```json
+{
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
+```
+
+### S3 + CloudFront
+
+In your CloudFront distribution, add a custom error response:
+- HTTP error code: `403` and `404`
+- Response page path: `/index.html`
+- HTTP response code: `200`
+
+### SSR / Express build
+
+No changes needed — the Express server already handles all routes and returns `index.html`. Hash routing is only used in the static build.
+
+---
+
 ## Credits
 
 Original open-source portal by [Bullhorn](https://github.com/bullhorn/career-portal).  
