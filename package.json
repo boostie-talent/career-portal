@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
+    "configure": "node scripts/generate-config.js",
     "start": "node dist/career-portal/server/server.mjs",
     "serve": "ng serve --configuration=static",
     "build": "ng build --configuration=dynamic",

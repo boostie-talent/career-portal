@@ -23,6 +23,8 @@ if (process.env.COMPANY_NAME) {
   appConfig.companyLogoPath = process.env.COMPANY_LOGO_URL as string;
   appConfig.integrations.googleAnalytics.trackingId = process.env.GOOGLE_ANALYTICS_TRACKING_ID as string;
   appConfig.integrations.googleSiteVerification.verificationCode = process.env.GOOGLE_VERIFICATION_CODE as string;
+  if (!appConfig.boostie) appConfig.boostie = { clientId: null };
+  appConfig.boostie.clientId = process.env.BOOSTIE_CLIENT_ID || null;
 
   writeFile(resolve(DIST_FOLDER, 'app.json'), JSON.stringify(appConfig), (err: any) => {
     if (err) {
