@@ -25,6 +25,8 @@ if (process.env.COMPANY_NAME) {
   appConfig.integrations.googleSiteVerification.verificationCode = process.env.GOOGLE_VERIFICATION_CODE as string;
   if (!appConfig.boostie) appConfig.boostie = { clientId: null };
   appConfig.boostie.clientId = process.env.BOOSTIE_CLIENT_ID || null;
+  if (!(appConfig as any).telemetry) (appConfig as any).telemetry = { disabled: false };
+  if (process.env.TELEMETRY_DISABLED === 'true') (appConfig as any).telemetry.disabled = true;
 
   writeFile(resolve(DIST_FOLDER, 'app.json'), JSON.stringify(appConfig), (err: any) => {
     if (err) {

@@ -191,6 +191,29 @@ scripts/
 
 ---
 
+## Telemetry
+
+This portal sends a single anonymous ping to Boostie once per browser session when it is loaded in production. The ping contains:
+
+| Field | Example | Purpose |
+|---|---|---|
+| `domain` | `careers.acmestaffing.com` | Identify the deployment |
+| `version` | `3.7.0` | Track which portal version is in use |
+| `timestamp` | `2026-04-26T14:32:00Z` | First-seen / last-seen |
+
+No personal data, no job seeker information, and no Bullhorn credentials are ever transmitted. The ping fires once per session (deduplicated via `sessionStorage`) and uses `navigator.sendBeacon` so it never blocks page load.
+
+**To opt out**, set `TELEMETRY_DISABLED=true` in your environment:
+
+```bash
+# .env
+TELEMETRY_DISABLED=true
+```
+
+Then run `npm run configure` (static builds) or set the env var in your hosting dashboard (SSR builds).
+
+---
+
 ## Clean URLs (removing the `#` from links)
 
 By default, static builds use Angular's hash-based routing (`/#/jobs/...`). This works on any static host without configuration, but isn't ideal for sharing or SEO.

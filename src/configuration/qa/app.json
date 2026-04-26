@@ -94,5 +94,8 @@
   },
   "boostie": {
     "clientId": null
+  },
+  "telemetry": {
+    "disabled": false
   }
 }

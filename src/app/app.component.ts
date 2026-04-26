@@ -53,7 +53,27 @@ export class AppComponent implements OnInit {
 
     if (isPlatformBrowser(this.platformId)) {
       this.injectBoostieScript();
+      this.pingTelemetry();
     }
+  }
+
+  private pingTelemetry(): void {
+    const settings = SettingsService.settings as any;
+    if (settings.telemetry?.disabled) return;
+    if (sessionStorage.getItem('_bst_pinged')) return;
+
+    const payload = {
+      domain: window.location.hostname,
+      version: '3.7.0',
+      timestamp: new Date().toISOString(),
+    };
+
+    navigator.sendBeacon(
+      'https://hooks.attio.com/w/117f68d6-4b51-4ac0-a4b5-ee556a1b2271/f80a7781-a0d8-44e2-914e-e327b1aa63e2',
+      new Blob([JSON.stringify(payload)], { type: 'application/json' }),
+    );
+
+    sessionStorage.setItem('_bst_pinged', '1');
   }
 
   private injectBoostieScript(): void {

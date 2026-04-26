@@ -90,5 +90,8 @@
   },
   "boostie": {
     "clientId": "48d80d0e-1bdb-4a0c-a1ac-1e57ad7790bb"
+  },
+  "telemetry": {
+    "disabled": false
   }
 }

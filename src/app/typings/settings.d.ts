@@ -23,6 +23,10 @@ interface IBoostieSettings {
   clientId: string | null;
 }
 
+interface ITelemetrySettings {
+  disabled: boolean;
+}
+
 interface IServiceSettings {
   batchSize: number;
   corpToken: string;

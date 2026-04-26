@@ -25,6 +25,7 @@ const mappings = {
   BOOSTIE_CLIENT_ID:              (c, v) => { if (!c.boostie) c.boostie = {}; c.boostie.clientId = v || null; },
   GOOGLE_ANALYTICS_TRACKING_ID:  (c, v) => { c.integrations.googleAnalytics.trackingId = v; },
   GOOGLE_VERIFICATION_CODE:      (c, v) => { c.integrations.googleSiteVerification.verificationCode = v; },
+  TELEMETRY_DISABLED:            (c, v) => { if (!c.telemetry) c.telemetry = {}; c.telemetry.disabled = v === 'true'; },
 };
 
 let changed = 0;
