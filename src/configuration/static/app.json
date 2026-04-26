@@ -32,7 +32,7 @@
   "maxUploadSize": 5242880,
   "service": {
     "batchSize": 500,
-    "corpToken": "1VCNF4",
+    "corpToken": "[ CORP TOKEN HERE ]",
     "port": null,
     "swimlane": "91",
     "fields": [
@@ -92,6 +92,7 @@
     "clientId": "48d80d0e-1bdb-4a0c-a1ac-1e57ad7790bb"
   },
   "telemetry": {
-    "disabled": false
+    "disabled": false,
+    "endpoint": ""
   }
 }

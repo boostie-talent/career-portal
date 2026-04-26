@@ -25,8 +25,9 @@ if (process.env.COMPANY_NAME) {
   appConfig.integrations.googleSiteVerification.verificationCode = process.env.GOOGLE_VERIFICATION_CODE as string;
   if (!appConfig.boostie) appConfig.boostie = { clientId: null };
   appConfig.boostie.clientId = process.env.BOOSTIE_CLIENT_ID || null;
-  if (!(appConfig as any).telemetry) (appConfig as any).telemetry = { disabled: false };
+  if (!(appConfig as any).telemetry) (appConfig as any).telemetry = { disabled: false, endpoint: '' };
   if (process.env.TELEMETRY_DISABLED === 'true') (appConfig as any).telemetry.disabled = true;
+  if (process.env.TELEMETRY_ENDPOINT) (appConfig as any).telemetry.endpoint = process.env.TELEMETRY_ENDPOINT;
 
   writeFile(resolve(DIST_FOLDER, 'app.json'), JSON.stringify(appConfig), (err: any) => {
     if (err) {
@@ -58,17 +59,19 @@ export function app(): express.Express {
   // Security response headers
   server.use((_req: any, res: any, next: any) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
     res.setHeader(
       'Content-Security-Policy',
       [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' https://trust-snippet.bullhornstaffing.com https://www.google-analytics.com",
+        "script-src 'self' 'unsafe-inline' https://trust-snippet.bullhornstaffing.com https://www.google-analytics.com https://api-us1.boostie.com",
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: https:",
         "font-src 'self' data:",
-        "connect-src 'self' https://*.bullhornstaffing.com https://www.google-analytics.com",
+        "connect-src 'self' https://*.bullhornstaffing.com https://www.google-analytics.com https://api-us1.boostie.com https://hooks.attio.com",
         "object-src 'none'",
         "base-uri 'self'",
       ].join('; '),

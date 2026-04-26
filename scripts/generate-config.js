@@ -26,6 +26,7 @@ const mappings = {
   GOOGLE_ANALYTICS_TRACKING_ID:  (c, v) => { c.integrations.googleAnalytics.trackingId = v; },
   GOOGLE_VERIFICATION_CODE:      (c, v) => { c.integrations.googleSiteVerification.verificationCode = v; },
   TELEMETRY_DISABLED:            (c, v) => { if (!c.telemetry) c.telemetry = {}; c.telemetry.disabled = v === 'true'; },
+  TELEMETRY_ENDPOINT:            (c, v) => { if (!c.telemetry) c.telemetry = {}; c.telemetry.endpoint = v; },
 };
 
 let changed = 0;

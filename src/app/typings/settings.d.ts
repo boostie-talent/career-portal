@@ -25,6 +25,7 @@ interface IBoostieSettings {
 
 interface ITelemetrySettings {
   disabled: boolean;
+  endpoint: string;
 }
 
 interface IServiceSettings {

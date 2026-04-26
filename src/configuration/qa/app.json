@@ -96,6 +96,7 @@
     "clientId": null
   },
   "telemetry": {
-    "disabled": false
+    "disabled": false,
+    "endpoint": ""
   }
 }
