@@ -1,0 +1,16 @@
+<!-- Footer — customize as needed -->
+<footer class="border-t border-border mt-16">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+
+    <span>&copy; {{ currentYear }} {{ companyName }}</span>
+
+    <nav class="flex items-center gap-6">
+      <a *ngIf="showPrivacyPolicy" routerLink="/privacy"
+         class="hover:text-foreground transition-colors">
+        Privacy Policy
+      </a>
+      <!-- Add additional footer links here -->
+    </nav>
+
+  </div>
+</footer>

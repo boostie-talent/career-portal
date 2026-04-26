@@ -16,25 +16,14 @@
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div class="flex gap-0 rounded-xl border border-border bg-background shadow-sm overflow-hidden">
 
-        <!-- What -->
-        <div class="flex-1 flex flex-col px-5 py-3 border-r border-border">
-          <label class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">What</label>
+        <!-- Keyword -->
+        <div class="flex-1 flex flex-col px-5 py-3">
+          <label class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">Search</label>
           <input
             type="text"
             class="text-sm text-foreground bg-transparent outline-none placeholder:text-muted-foreground/60"
             placeholder="Job title, keywords..."
             [(ngModel)]="whatInput"
-            (keyup.enter)="search()" />
-        </div>
-
-        <!-- Where -->
-        <div class="flex-1 flex flex-col px-5 py-3 border-r border-border">
-          <label class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">Where</label>
-          <input
-            type="text"
-            class="text-sm text-foreground bg-transparent outline-none placeholder:text-muted-foreground/60"
-            placeholder="City, state..."
-            [(ngModel)]="whereInput"
             (keyup.enter)="search()" />
         </div>
 

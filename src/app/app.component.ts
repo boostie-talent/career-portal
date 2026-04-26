@@ -1,6 +1,7 @@
 import { Component, OnInit, Renderer2, Inject, PLATFORM_ID } from '@angular/core';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { isPlatformBrowser, NgIf } from '@angular/common';
+import { FooterComponent } from './footer/footer.component';
 import { DOCUMENT } from '@angular/common';
 import { SettingsService } from './services/settings/settings.service';
 import { Meta } from '@angular/platform-browser';
@@ -8,7 +9,7 @@ import { Meta } from '@angular/platform-browser';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NgIf],
+  imports: [RouterOutlet, NgIf, FooterComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })

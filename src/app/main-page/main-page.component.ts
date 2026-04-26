@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { NgIf, NgStyle } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { LucideAngularModule, TriangleAlert, Search, MapPin } from 'lucide-angular';
+import { LucideAngularModule, TriangleAlert, Search } from 'lucide-angular';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { JobListComponent } from '../job-list/job-list.component';
 import { SearchService } from '../services/search/search.service';
@@ -16,10 +16,9 @@ import { SettingsService } from '../services/settings/settings.service';
   templateUrl: './main-page.component.html',
 })
 export class MainPageComponent {
-  public icons = { TriangleAlert, Search, MapPin };
+  public icons = { TriangleAlert, Search };
 
   public whatInput: string = '';
-  public whereInput: string = '';
 
   public filterCount: number = 1;
   public listFilter: any = {};
@@ -34,12 +33,6 @@ export class MainPageComponent {
 
   public search(): void {
     const next: any = {};
-
-    if (this.whereInput.trim()) {
-      const w = this.whereInput.trim();
-      next['location'] =
-        `address.city{?^^equals}{?^^delimiter}${w}*{?^^delimiter} OR address.state{?^^equals}{?^^delimiter}${w}*{?^^delimiter}`;
-    }
 
     if (this.whatInput.trim()) {
       const fields = SettingsService.settings.service.keywordSearchFields;
